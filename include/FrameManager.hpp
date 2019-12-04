@@ -31,9 +31,9 @@ private:
 
     std::optional<std::function<void()>> _onSecondFunc{std::nullopt};
 public:
-    FrameManager() = default;
+    FrameManager();
 
-    uint32_t update() noexcept;
+    void update() noexcept;
     void onSecond(const std::function<void()> &func) noexcept;
 
     [[nodiscard]] double getDeltaTime() const noexcept;

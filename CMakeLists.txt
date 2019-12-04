@@ -12,5 +12,6 @@ add_executable(
         quad-demo
         src/Main.cpp
         src/App.cpp include/App.hpp
+        src/Random.cpp include/Random.hpp
         src/FrameManager.cpp include/FrameManager.hpp
-)
+        src/Particle.cpp include/Particle.hpp)

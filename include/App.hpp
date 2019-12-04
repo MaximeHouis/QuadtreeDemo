@@ -9,11 +9,15 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <vector>
+
+#include "Particle.hpp"
 #include "FrameManager.hpp"
 
 class App final {
 public:
-
+    static constexpr const auto WIN_W{1600u};
+    static constexpr const auto WIN_H{900u};
 private:
     FrameManager _frameManager{};
 
@@ -23,7 +27,7 @@ private:
     sf::Font _font{};
     sf::Text _fpsCounter{};
 
-    decltype(std::declval<FrameManager>().getDeltaTime()) _deltaTime{};
+    std::vector<Particle> _particles{};
 
     void _pollEvents();
     void _tick();

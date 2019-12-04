@@ -9,7 +9,12 @@
 
 bool FrameManager::_highResFpsCounter{false};
 
-uint32_t FrameManager::update() noexcept
+FrameManager::FrameManager()
+        : _lastFrame{Clock::now()}
+{
+}
+
+void FrameManager::update() noexcept
 {
     const auto timePoint = Clock::now();
 
@@ -37,8 +42,6 @@ uint32_t FrameManager::update() noexcept
                 _onSecondFunc.value()();
         }
     }
-
-    return _deltaTime;
 }
 
 void FrameManager::onSecond(const std::function<void()> &func) noexcept
