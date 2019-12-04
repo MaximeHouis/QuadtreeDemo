@@ -12,8 +12,8 @@
 Particle::Particle(float x, float y)
         : _shape{}, _dir{}
 {
-    const auto dx = static_cast<float>(Random::getDouble(-1, 1) * (Random::getBool() ? 1 : -1));
-    const auto dy = static_cast<float>((1.0f - std::fabs(dx)) * (float) (Random::getBool() ? 1 : -1));
+    const auto dx = static_cast<float>(Random::getDouble(-1, 1) * (Random::getBool() ? 1.0 : -1.0));
+    const auto dy = static_cast<float>((1.0f - std::fabs(dx)) * (Random::getBool() ? 1.0 : -1.0));
 
     _dir = sf::Vector2f{dx, dy};
 
@@ -28,14 +28,16 @@ Particle::Particle(float x, float y)
 
 void Particle::tick(float deltaTime)
 {
-    const sf::Vector2f moveVec{_dir.x * SPEED * deltaTime, _dir.y * SPEED * deltaTime};
+    sf::Vector2f moveVec{_dir.x * SPEED * deltaTime, _dir.y * SPEED * deltaTime};
     const auto pos = _shape.getPosition();
     const auto future = pos + moveVec;
 
-    if (_isOutOfBounds(future))
+    if (_isOutOfBounds(future)) {
         _bounce();
-    else
-        _shape.move(moveVec);
+        moveVec = sf::Vector2f{_dir.x * SPEED * deltaTime, _dir.y * SPEED * deltaTime};
+    }
+
+    _shape.move(moveVec);
 }
 
 void Particle::_bounce() noexcept
@@ -46,7 +48,7 @@ void Particle::_bounce() noexcept
         _dir.x *= -1.0;
 
     if (pos.y < 0 || pos.y > App::WIN_H)
-        _dir.x *= -1.0;
+        _dir.y *= -1.0;
 }
 
 bool Particle::_isOutOfBounds(const sf::Vector2f &pos) noexcept

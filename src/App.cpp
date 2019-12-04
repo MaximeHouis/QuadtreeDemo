@@ -21,8 +21,14 @@ App::App()
     _fpsCounter.setPosition(10, 10);
     _fpsCounter.setCharacterSize(21);
 
+    _entCount.setFont(_font);
+    _entCount.setFillColor(sf::Color::Yellow);
+    _entCount.setPosition(10, 42);
+    _entCount.setCharacterSize(21);
+
     _frameManager.onSecond([&] {
         _fpsCounter.setString(std::to_string(_frameManager.getFramerate()) + " fps");
+        _entCount.setString(std::to_string(_particles.size()) + " entities");
     });
 }
 
@@ -45,6 +51,8 @@ void App::_pollEvents()
         if (_event.type == sf::Event::EventType::MouseButtonPressed)
             for (int i = 0; i < 10; ++i)
                 _particles.emplace_back(sf::Mouse::getPosition(_sfWin));
+        if (_event.type == sf::Event::KeyPressed && _event.key.code == sf::Keyboard::Space)
+            _particles.clear();
     }
 }
 
@@ -58,10 +66,11 @@ void App::_render()
 {
     _sfWin.clear();
 
-    _sfWin.draw(_fpsCounter);
-
     for (const auto &particle : _particles)
         _sfWin.draw(particle.getShape());
+
+    _sfWin.draw(_fpsCounter);
+    _sfWin.draw(_entCount);
 
     _sfWin.display();
 }

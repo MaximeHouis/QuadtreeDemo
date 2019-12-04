@@ -26,6 +26,7 @@ private:
 
     sf::Font _font{};
     sf::Text _fpsCounter{};
+    sf::Text _entCount{};
 
     std::vector<Particle> _particles{};
 
