@@ -38,25 +38,50 @@ void App::run()
     }
 }
 
+void App::_keyPressed(sf::Keyboard::Key code)
+{
+    switch (code) {
+
+        case sf::Keyboard::Space:
+            _particles.clear();
+            break;
+
+        case sf::Keyboard::Q:
+        case sf::Keyboard::Delete:
+        case sf::Keyboard::Escape:
+            _sfWin.close();
+            break;
+
+        case sf::Keyboard::F:
+            _freeze = !_freeze;
+
+        default:
+            break;
+    }
+}
+
 void App::_pollEvents()
 {
-    // TODO: Improve this mess
-
     while (_sfWin.pollEvent(_event)) {
         if (_event.type == sf::Event::Closed)
             _sfWin.close();
 
+        if (_event.type == sf::Event::KeyPressed)
+            _keyPressed(_event.key.code);
+
         if (_event.type == sf::Event::EventType::MouseButtonPressed)
             for (int i = 0; i < 10; ++i)
                 _particles.emplace_back(sf::Mouse::getPosition(_sfWin));
-
-        if (_event.type == sf::Event::KeyPressed && _event.key.code == sf::Keyboard::Space)
-            _particles.clear();
     }
 }
 
 void App::_tick()
 {
+    if (_freeze)
+        return;
+
+    // TODO: Update quads instead of recreating it
+
     _quadtree = Quadtree{0, 0, WIN_W, WIN_H};
 
     for (auto &particle : _particles) {

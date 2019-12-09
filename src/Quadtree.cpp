@@ -9,7 +9,7 @@
 
 #include "Quadtree.hpp"
 
-size_t Quadtree::_MaxUnits{10};
+size_t Quadtree::_MaxUnits{5};
 size_t Quadtree::_MaxDepth{10};
 
 Quadtree::Quadtree(const sf::FloatRect &location)

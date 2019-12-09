@@ -31,6 +31,9 @@ private:
     std::vector<Particle> _particles{};
     Quadtree _quadtree{0, 0, WIN_W, WIN_H};
 
+    bool _freeze{false};
+
+    void _keyPressed(sf::Keyboard::Key code);
     void _pollEvents();
     void _tick();
     void _render();
