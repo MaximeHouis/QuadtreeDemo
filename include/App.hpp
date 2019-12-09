@@ -13,11 +13,12 @@
 
 #include "Particle.hpp"
 #include "FrameManager.hpp"
+#include "Quadtree.hpp"
 
 class App final {
 public:
-    static constexpr const auto WIN_W{1600u};
-    static constexpr const auto WIN_H{900u};
+    static constexpr const auto WIN_W{1000u};
+    static constexpr const auto WIN_H{1000u};
 private:
     FrameManager _frameManager{};
 
@@ -25,10 +26,10 @@ private:
     sf::Event _event{};
 
     sf::Font _font{};
-    sf::Text _fpsCounter{};
-    sf::Text _entCount{};
+    sf::Text _statsText{};
 
     std::vector<Particle> _particles{};
+    Quadtree _quadtree{0, 0, WIN_W, WIN_H};
 
     void _pollEvents();
     void _tick();

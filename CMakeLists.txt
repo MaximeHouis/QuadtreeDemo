@@ -14,4 +14,4 @@ add_executable(
         src/App.cpp include/App.hpp
         src/Random.cpp include/Random.hpp
         src/FrameManager.cpp include/FrameManager.hpp
-        src/Particle.cpp include/Particle.hpp)
+        src/Particle.cpp include/Particle.hpp src/Quadtree.cpp include/Quadtree.hpp)
