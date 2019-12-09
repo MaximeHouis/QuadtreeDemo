@@ -17,10 +17,10 @@ Particle::Particle(float x, float y)
 
     _dir = sf::Vector2f{dx, dy};
 
-    const float radius = 5;
+    const float radius = 2.5f;
     const sf::Vector2f origin{radius / 2.f, radius / 2.f};
 
-    _shape.setRadius(5);
+    _shape.setRadius(radius);
     _shape.setOrigin(origin);
     _shape.setPosition(x, y);
     _shape.setFillColor(sf::Color::Yellow);
