@@ -28,8 +28,8 @@ private:
     sf::Font _font{};
     sf::Text _statsText{};
 
-    std::vector<Particle> _particles{};
-    Quadtree _quadtree{0, 0, WIN_W, WIN_H};
+    std::vector<std::unique_ptr<Particle>> _particles{};
+    Quadtree _quadtree{0, 0, WIN_W, WIN_H, 0};
 
     bool _freeze{false};
 

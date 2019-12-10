@@ -19,8 +19,6 @@ class Quadtree {
 public:
     static size_t _MaxUnits;
     static size_t _MaxDepth;
-
-    using Entity = const Particle *;
 private:
     struct Children {
         std::unique_ptr<Quadtree> nw{nullptr};
@@ -29,19 +27,29 @@ private:
         std::unique_ptr<Quadtree> sw{nullptr};
     };
 
-    std::vector<Entity> _units{};
+    std::vector<const Particle *> _entities{};
     std::unique_ptr<Children> _children{nullptr};
 
     sf::FloatRect _location;
     sf::RectangleShape _visual{};
 
-    void _split();
-public:
-    explicit Quadtree(const sf::FloatRect &location);
-    Quadtree(float x, float y, float w, float h);
+    size_t _depth;
 
-    bool insert(Entity entity);
+    void _split();
+    void _purge(decltype(_entities) &purge);
+
+    void _pushEntities(decltype(_entities) &vec) const noexcept;
+    [[nodiscard]] decltype(_entities) _getAllEntities() const noexcept;
+public:
+    Quadtree(const sf::FloatRect &location, size_t depth);
+    Quadtree(float x, float y, float w, float h, size_t depth);
+
+    bool insert(const Particle *entity);
     void draw(sf::RenderWindow &window) const noexcept;
+    void update();
+    void clear();
+
+    // TODO: Erase one particle from tree
 
     [[nodiscard]] size_t size() const noexcept;
     [[nodiscard]] size_t count() const noexcept;

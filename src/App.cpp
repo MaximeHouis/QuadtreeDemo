@@ -43,6 +43,7 @@ void App::_keyPressed(sf::Keyboard::Key code)
     switch (code) {
 
         case sf::Keyboard::Space:
+            _quadtree.clear();
             _particles.clear();
             break;
 
@@ -69,25 +70,28 @@ void App::_pollEvents()
         if (_event.type == sf::Event::KeyPressed)
             _keyPressed(_event.key.code);
 
-        if (_event.type == sf::Event::EventType::MouseButtonPressed)
-            for (int i = 0; i < 10; ++i)
-                _particles.emplace_back(sf::Mouse::getPosition(_sfWin));
+        if (_event.type == sf::Event::EventType::MouseButtonPressed) {
+            const auto pos = sf::Mouse::getPosition(_sfWin);
+
+            for (int i = 0; i < 10; ++i) {
+                auto ptr = std::make_unique<Particle>(pos);
+
+                _quadtree.insert(ptr.get());
+                _particles.push_back(std::move(ptr));
+            }
+        }
     }
 }
 
 void App::_tick()
 {
+    _quadtree.update();
+
     if (_freeze)
         return;
 
-    // TODO: Update quads instead of recreating it
-
-    _quadtree = Quadtree{0, 0, WIN_W, WIN_H};
-
-    for (auto &particle : _particles) {
-        _quadtree.insert(&particle);
-        particle.tick(static_cast<float>(_frameManager.getDeltaTime()));
-    }
+    for (auto &particle : _particles)
+        particle->tick(static_cast<float>(_frameManager.getDeltaTime()));
 }
 
 void App::_render()
@@ -95,7 +99,7 @@ void App::_render()
     _sfWin.clear();
 
     for (const auto &particle : _particles)
-        _sfWin.draw(particle.getShape());
+        _sfWin.draw(particle->getShape());
 
     _quadtree.draw(_sfWin);
     _sfWin.draw(_statsText);
