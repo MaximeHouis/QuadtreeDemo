@@ -32,9 +32,9 @@ public:
     }
 
     void tick(float deltaTime);
+    const sf::CircleShape &getShape() const noexcept;
 
     static void toggleGravity() noexcept;
     static bool isGravityEnabled() noexcept;
     static void setGravityEnabled(bool gravityEnabled) noexcept;
-    const sf::CircleShape &getShape() const noexcept;
 };

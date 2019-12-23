@@ -38,8 +38,9 @@ void Particle::_bounce() noexcept
     if (pos.y < 0 || pos.y > App::WIN_H)
         _speed.y *= -1.0;
 
+    // Limit bouncing off the ground, energy loss simulation.
     if (pos.y > App::WIN_H)
-        _speed.y *= 0.75;
+        _speed.y *= 2.0 / 3.0;
 }
 
 void Particle::tick(float deltaTime)
