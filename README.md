@@ -12,7 +12,9 @@ You need the [SFML Library](https://github.com/SFML/SFML) in order to compile an
 
 ### Build
 ```sh
-$> mkdir build && cd build && cmake .. && make
+$> mkdir -p build && cd build && cmake .. && make
+# or
+$> ./setup.sh
 ```
 
 ### Run
