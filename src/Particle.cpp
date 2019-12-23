@@ -9,13 +9,15 @@
 #include "Random.hpp"
 #include "Particle.hpp"
 
+bool Particle::_gravityEnabled{false};
+
 Particle::Particle(float x, float y)
-        : _shape{}, _dir{}
+        : _shape{}, _speed{}
 {
     const auto dx = static_cast<float>(Random::getDouble(-1, 1) * (Random::getBool() ? 1.0 : -1.0));
     const auto dy = static_cast<float>((1.0f - std::fabs(dx)) * (Random::getBool() ? 1.0 : -1.0));
 
-    _dir = sf::Vector2f{dx, dy};
+    _speed = sf::Vector2f{dx, dy};
 
     const float radius = 2.5f;
     const sf::Vector2f origin{radius / 2.f, radius / 2.f};
@@ -26,29 +28,36 @@ Particle::Particle(float x, float y)
     _shape.setFillColor(sf::Color::Yellow);
 }
 
-void Particle::tick(float deltaTime)
-{
-    sf::Vector2f moveVec{_dir.x * SPEED * deltaTime, _dir.y * SPEED * deltaTime};
-    const auto pos = _shape.getPosition();
-    const auto future = pos + moveVec;
-
-    if (_isOutOfBounds(future)) {
-        _bounce();
-        moveVec = sf::Vector2f{_dir.x * SPEED * deltaTime, _dir.y * SPEED * deltaTime};
-    }
-
-    _shape.move(moveVec);
-}
-
 void Particle::_bounce() noexcept
 {
     const auto pos = _shape.getPosition();
 
     if (pos.x < 0 || pos.x > App::WIN_W)
-        _dir.x *= -1.0;
+        _speed.x *= -1.0;
 
     if (pos.y < 0 || pos.y > App::WIN_H)
-        _dir.y *= -1.0;
+        _speed.y *= -1.0;
+
+    if (pos.y > App::WIN_H)
+        _speed.y *= 0.75;
+}
+
+void Particle::tick(float deltaTime)
+{
+    if (_gravityEnabled) {
+        _speed.y += GRAVITY * deltaTime;
+    }
+
+    sf::Vector2f moveVec{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
+    const auto pos = _shape.getPosition();
+    const auto future = pos + moveVec;
+
+    if (_isOutOfBounds(future)) {
+        _bounce();
+        moveVec = sf::Vector2f{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
+    }
+
+    _shape.move(moveVec);
 }
 
 bool Particle::_isOutOfBounds(const sf::Vector2f &pos) noexcept
@@ -62,4 +71,19 @@ bool Particle::_isOutOfBounds(const sf::Vector2f &pos) noexcept
 const sf::CircleShape &Particle::getShape() const noexcept
 {
     return _shape;
+}
+
+void Particle::toggleGravity() noexcept
+{
+    _gravityEnabled = !_gravityEnabled;
+}
+
+bool Particle::isGravityEnabled() noexcept
+{
+    return _gravityEnabled;
+}
+
+void Particle::setGravityEnabled(bool gravityEnabled) noexcept
+{
+    _gravityEnabled = gravityEnabled;
 }

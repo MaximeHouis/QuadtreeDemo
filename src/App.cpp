@@ -23,7 +23,8 @@ App::App()
 
     _frameManager.onSecond([&] {
         _statsText.setString(std::to_string(_frameManager.getFramerate()) + " fps\n" +
-                             std::to_string(_particles.size()) + " entities");
+                             std::to_string(_particles.size()) + " entities\n" +
+                             "Gravity: " + (Particle::isGravityEnabled() ? "on" : "off"));
     });
 }
 
@@ -41,7 +42,6 @@ void App::run()
 void App::_keyPressed(sf::Keyboard::Key code)
 {
     switch (code) {
-
         case sf::Keyboard::Space:
             _quadtree.clear();
             _particles.clear();
@@ -55,6 +55,11 @@ void App::_keyPressed(sf::Keyboard::Key code)
 
         case sf::Keyboard::F:
             _freeze = !_freeze;
+            break;
+
+        case sf::Keyboard::G:
+            Particle::toggleGravity();
+            break;
 
         default:
             break;
