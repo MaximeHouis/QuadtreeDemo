@@ -5,7 +5,7 @@
 ** Particle.cpp
 */
 
-#include <App.hpp>
+#include "App.hpp"
 #include "Random.hpp"
 #include "Particle.hpp"
 
@@ -19,12 +19,9 @@ Particle::Particle(float x, float y)
 
     _speed = sf::Vector2f{dx, dy};
 
-    const float radius = 2.5f;
-    const sf::Vector2f origin{radius / 2.f, radius / 2.f};
-
-    _shape.setRadius(radius);
-    _shape.setOrigin(origin);
+    _shape.setRadius(RADIUS);
     _shape.setPosition(x, y);
+    _shape.setOrigin(sf::Vector2f{RADIUS / 2.f, RADIUS / 2.f});
     _shape.setFillColor(sf::Color::Yellow);
 }
 
@@ -39,8 +36,8 @@ void Particle::_bounce() noexcept
         _speed.y *= -1.0;
 
     // Limit bouncing off the ground, energy loss simulation.
-    if (pos.y > App::WIN_H)
-        _speed.y *= 2.0 / 3.0;
+    if (_gravityEnabled && pos.y > App::WIN_H)
+        _speed.y *= 0.575;
 }
 
 void Particle::tick(float deltaTime)
@@ -63,10 +60,10 @@ void Particle::tick(float deltaTime)
 
 bool Particle::_isOutOfBounds(const sf::Vector2f &pos) noexcept
 {
-    return pos.x < 0 ||
-           pos.y < 0 ||
-           pos.x > App::WIN_W ||
-           pos.y > App::WIN_H;
+    return pos.x - RADIUS < 0 ||
+           pos.y - RADIUS < 0 ||
+           pos.x + RADIUS > App::WIN_W ||
+           pos.y + RADIUS > App::WIN_H;
 }
 
 const sf::CircleShape &Particle::getShape() const noexcept

@@ -13,6 +13,7 @@ class Particle {
 private:
     static constexpr const auto MAX_SPEED = 275.f;
     static constexpr const auto GRAVITY = 9.81f;
+    static constexpr const auto RADIUS = 2.5f;
 
     static bool _gravityEnabled;
 
