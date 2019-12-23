@@ -61,6 +61,10 @@ void App::_keyPressed(sf::Keyboard::Key code)
             Particle::toggleGravity();
             break;
 
+        case sf::Keyboard::H:
+            _drawQuads = !_drawQuads;
+            break;
+
         default:
             break;
     }
@@ -106,7 +110,8 @@ void App::_render()
     for (const auto &particle : _particles)
         _sfWin.draw(particle->getShape());
 
-    _quadtree.draw(_sfWin);
+    if (_drawQuads)
+        _quadtree.draw(_sfWin);
     _sfWin.draw(_statsText);
 
     _sfWin.display();

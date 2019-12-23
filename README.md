@@ -17,9 +17,11 @@ $> mkdir build && cd build && cmake .. && make
 
 ### Run
 * **Click** somewhere in the window to generate particles.
-* Press **Space** to remove every particles.
 * Press **F** to freeze time.
+* Press **G** to toggle gravity on/off.
+* Press **H** to hide/show the quadtree.
+* Press **Space** to remove every particles.
 * Press **ESC, DEL or Q** to exit the program.
 
 ## Contribute
-Feel free to contribute, make suggetions and report bugs! :)
+Feel free to contribute, make suggestions and report bugs! :)

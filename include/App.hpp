@@ -32,6 +32,7 @@ private:
     Quadtree _quadtree{0, 0, WIN_W, WIN_H, 0};
 
     bool _freeze{false};
+    bool _drawQuads{true};
 
     void _keyPressed(sf::Keyboard::Key code);
     void _pollEvents();
