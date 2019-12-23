@@ -5,6 +5,7 @@
 ** App.cpp
 */
 
+#include <sstream>
 #include <iostream>
 
 #include "App.hpp"
@@ -12,7 +13,7 @@
 App::App()
         : _sfWin{sf::VideoMode{WIN_W, WIN_H}, "Quadtree Demo", sf::Style::Close}
 {
-//    _sfWin.setFramerateLimit(145);
+    _sfWin.setVerticalSyncEnabled(true);
 
     _font.loadFromFile("Assets/Fonts/Cascadia.ttf");
 
@@ -22,9 +23,16 @@ App::App()
     _statsText.setCharacterSize(21);
 
     _frameManager.onSecond([&] {
-        _statsText.setString(std::to_string(_frameManager.getFramerate()) + " fps\n" +
-                             std::to_string(_particles.size()) + " entities\n" +
-                             "Gravity: " + (Particle::isGravityEnabled() ? "on" : "off"));
+        const auto quads = Quadtree::getInstanceCount();
+        std::stringstream ss;
+
+        ss <<
+           _frameManager.getFramerate() << " fps\n" <<
+           _particles.size() << " entities\n" <<
+           quads << " quad" << (quads != 1 ? "s" : "") << "\n" <<
+           "Gravity: " << (Particle::isGravityEnabled() ? "on" : "off");
+
+        _statsText.setString(ss.str());
     });
 }
 

@@ -12,9 +12,13 @@
 size_t Quadtree::_MaxUnits{5};
 size_t Quadtree::_MaxDepth{10};
 
+std::atomic<size_t> Quadtree::_instanceCount{0};
+
 Quadtree::Quadtree(const sf::FloatRect &location, size_t depth)
         : _location{location}, _depth{depth}
 {
+    ++_instanceCount;
+
     _visual.setOutlineThickness(1.f);
     _visual.setOutlineColor(sf::Color::Yellow);
     _visual.setFillColor(sf::Color::Transparent);
@@ -25,6 +29,11 @@ Quadtree::Quadtree(const sf::FloatRect &location, size_t depth)
 Quadtree::Quadtree(float x, float y, float w, float h, size_t depth)
         : Quadtree(sf::FloatRect{x, y, w, h}, depth)
 {
+}
+
+Quadtree::~Quadtree()
+{
+    --_instanceCount;
 }
 
 void Quadtree::_split()
@@ -176,4 +185,9 @@ size_t Quadtree::count() const noexcept
 bool Quadtree::hasChildren() const noexcept
 {
     return _children != nullptr;
+}
+
+size_t Quadtree::getInstanceCount() noexcept
+{
+    return _instanceCount;
 }

@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <vector>
+#include <atomic>
 #include <optional>
 
 #include <SFML/Graphics.hpp>
@@ -27,6 +28,8 @@ private:
         std::unique_ptr<Quadtree> sw{nullptr};
     };
 
+    static std::atomic<size_t> _instanceCount;
+
     std::vector<const Particle *> _entities{};
     std::unique_ptr<Children> _children{nullptr};
 
@@ -43,6 +46,7 @@ private:
 public:
     Quadtree(const sf::FloatRect &location, size_t depth);
     Quadtree(float x, float y, float w, float h, size_t depth);
+    ~Quadtree();
 
     bool insert(const Particle *entity);
     void draw(sf::RenderWindow &window) const noexcept;
@@ -54,4 +58,6 @@ public:
     [[nodiscard]] size_t size() const noexcept;
     [[nodiscard]] size_t count() const noexcept;
     [[nodiscard]] bool hasChildren() const noexcept;
+
+    [[nodiscard]] static size_t getInstanceCount() noexcept;
 };
