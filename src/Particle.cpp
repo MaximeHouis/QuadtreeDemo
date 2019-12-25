@@ -30,37 +30,45 @@ Particle::Particle(float x, float y)
  * The future position is out of bounds.
  * We need to find the point where the particle intersects the outer bounds.
  */
-sf::Vector2f Particle::_intersectCollision(const sf::Vector2f &A, const sf::Vector2f &B) noexcept
+sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A, const sf::Vector2f &B) noexcept
 {
-    if (B.y + RADIUS > App::WIN_H) {
-        // Let A be the current position, B the future position (out of bounds),
-        // C the right angle point from A and B,
-        // D the right angle point on the horizontal axis,
-        // Z the intersection point we are trying to find.
-        const auto C = sf::Vector2f{A.x, B.y};
-        const auto D = sf::Vector2f{A.x, App::WIN_H - RADIUS};
-        const auto AD = Utils::distance(A, D);
-        const auto AC = Utils::distance(A, C);
-        const auto CB = Utils::distance(B, C);
-        const auto DZ = (CB / AC) * AD;             // Simplified from std::tan(std::atan(CB / AC)) * AD
-        const auto Z = sf::Vector2f{A.x + DZ, D.y};
+    // Let A be the current position, B the future position (out of bounds),
+    // C the right angle point from A and B,
+    // D the right angle point on the corresponding axis,
+    // Z the intersection point we are trying to find.
 
-        return Z;
+    sf::Vector2f C;
+    sf::Vector2f D;
+
+    if (bound == UP || bound == DOWN) {
+        C = sf::Vector2f{A.x, B.y};
+        D = sf::Vector2f{A.x, bound == UP ? RADIUS : App::WIN_H - RADIUS};
     } else {
-        return B;
+        C = sf::Vector2f{B.x, A.y};
+        D = sf::Vector2f{bound == LEFT ? RADIUS : App::WIN_W - RADIUS, A.y};
     }
+
+    const auto AD = Utils::distance(A, D);
+    const auto AC = Utils::distance(A, C);
+    const auto CB = Utils::distance(B, C);
+    const auto DZ = (CB / AC) * AD;         // Simplified from std::tan(std::atan(CB / AC)) * AD
+
+    if (bound == UP || bound == DOWN)
+        return sf::Vector2f{A.x + DZ, D.y};
+    else
+        return sf::Vector2f{D.x, A.y + DZ};
 }
 
-void Particle::_bounce(const sf::Vector2f &future) noexcept
+void Particle::_bounce(Boundary bound) noexcept
 {
-    if (future.x - RADIUS < 0 || future.x + RADIUS > App::WIN_W)
+    if (bound == LEFT || bound == RIGHT)
         _speed.x *= -1.0;
 
-    if (future.y - RADIUS < 0 || future.y + RADIUS > App::WIN_H)
+    if (bound == UP || bound == DOWN)
         _speed.y *= -1.0;
 
     // Limit bouncing off the ground, energy loss simulation.
-    if (_gravityEnabled && future.y + RADIUS > App::WIN_H)
+    if (_gravityEnabled && bound == DOWN)
         _speed.y *= 0.575;
 }
 
@@ -73,20 +81,29 @@ void Particle::tick(float deltaTime)
     auto moveVec = sf::Vector2f{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
     auto future = pos + moveVec;
 
-    if (_isOutOfBounds(future)) {
-        _bounce(future);
-        future = _intersectCollision(pos, future);
+    if (const auto bound = _isOutOfBounds(future)) {
+        _bounce(bound);
+        future = _intersectCollision(bound, pos, future);
     }
 
     _shape.setPosition(future);
 }
 
-bool Particle::_isOutOfBounds(const sf::Vector2f &pos) noexcept
+Particle::Boundary Particle::_isOutOfBounds(const sf::Vector2f &pos) noexcept
 {
-    return pos.x - RADIUS < 0 ||
-           pos.y - RADIUS < 0 ||
-           pos.x + RADIUS > App::WIN_W ||
-           pos.y + RADIUS > App::WIN_H;
+    if (pos.y - RADIUS < 0)
+        return Boundary::UP;
+
+    if (pos.x + RADIUS > App::WIN_W)
+        return Boundary::RIGHT;
+
+    if (pos.y + RADIUS > App::WIN_H)
+        return Boundary::DOWN;
+
+    if (pos.x - RADIUS < 0)
+        return Boundary::LEFT;
+
+    return Boundary::NONE;
 }
 
 const sf::CircleShape &Particle::getShape() const noexcept

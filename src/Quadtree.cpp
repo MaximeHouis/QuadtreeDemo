@@ -134,9 +134,12 @@ void Quadtree::update()
     purge.clear();
     _purge(purge);
 
-    for (auto &item : purge)
-        if (!insert(item))
+    for (auto &item : purge) {
+        if (!insert(item)) {
+            // Shouldn't happen anymore because particle tunneling is now fixed on all boundaries.
             std::cerr << "Insertion failed: " << item->getShape().getPosition() << std::endl;
+        }
+    }
 }
 
 void Quadtree::clear()

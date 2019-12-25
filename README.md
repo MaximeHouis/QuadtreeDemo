@@ -19,6 +19,7 @@ $> ./setup.sh
 
 ### Run
 * **Click** somewhere in the window to generate particles.
+* Press **S** to slow down time by 50%.
 * Press **F** to freeze time.
 * Press **G** to toggle gravity on/off.
 * Press **H** to hide/show the quadtree.

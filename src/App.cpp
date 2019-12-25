@@ -107,8 +107,11 @@ void App::_tick()
     if (_freeze)
         return;
 
+    const auto slowmoFactor = sf::Keyboard::isKeyPressed(sf::Keyboard::S) ? 0.5f : 1.f;
+    const auto dt = static_cast<float>(_frameManager.getDeltaTime()) * slowmoFactor;
+
     for (auto &particle : _particles)
-        particle->tick(static_cast<float>(_frameManager.getDeltaTime()));
+        particle->tick(dt);
 }
 
 void App::_render()

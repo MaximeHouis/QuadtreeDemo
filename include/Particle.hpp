@@ -11,19 +11,30 @@
 
 class Particle {
 private:
+    enum Boundary : std::uint8_t {
+        NONE = 0,
+        UP = 1,
+        RIGHT = 2,
+        DOWN = 4,
+        LEFT = 8,
+
+        HORIZONTAL = UP | DOWN,
+        VERTICAL = LEFT | RIGHT
+    };
+
     static constexpr const auto MAX_SPEED = 275.f;
     static constexpr const auto GRAVITY = 9.81f;
     static constexpr const auto RADIUS = 2.5f;
 
     static bool _gravityEnabled;
 
+    static sf::Vector2f _intersectCollision(Boundary bound, const sf::Vector2f &A, const sf::Vector2f &B) noexcept;
+    static Boundary _isOutOfBounds(const sf::Vector2f &pos) noexcept;
+
     sf::CircleShape _shape;
     sf::Vector2f _speed;
 
-    void _bounce(const sf::Vector2f &future) noexcept;
-
-    static sf::Vector2f _intersectCollision(const sf::Vector2f &A, const sf::Vector2f &B) noexcept;
-    static bool _isOutOfBounds(const sf::Vector2f &pos) noexcept;
+    void _bounce(Boundary bound) noexcept;
 public:
     Particle(float x, float y);
 
