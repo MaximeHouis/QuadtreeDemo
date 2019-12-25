@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include "Utils.hpp"
 #include "Quadtree.hpp"
 
 size_t Quadtree::_MaxUnits{5};
@@ -134,7 +135,8 @@ void Quadtree::update()
     _purge(purge);
 
     for (auto &item : purge)
-        insert(item);
+        if (!insert(item))
+            std::cerr << "Insertion failed: " << item->getShape().getPosition() << std::endl;
 }
 
 void Quadtree::clear()

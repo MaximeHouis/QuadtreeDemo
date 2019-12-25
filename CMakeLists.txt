@@ -16,6 +16,6 @@ add_executable(
         src/FrameManager.cpp include/FrameManager.hpp
         src/Particle.cpp include/Particle.hpp
         src/Quadtree.cpp include/Quadtree.hpp
-)
+        src/Utils.cpp include/Utils.hpp)
 
 file(COPY Assets DESTINATION ${CMAKE_BINARY_DIR})

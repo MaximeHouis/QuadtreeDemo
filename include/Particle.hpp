@@ -20,8 +20,9 @@ private:
     sf::CircleShape _shape;
     sf::Vector2f _speed;
 
-    void _bounce() noexcept;
+    void _bounce(const sf::Vector2f &future) noexcept;
 
+    static sf::Vector2f _intersectCollision(const sf::Vector2f &A, const sf::Vector2f &B) noexcept;
     static bool _isOutOfBounds(const sf::Vector2f &pos) noexcept;
 public:
     Particle(float x, float y);

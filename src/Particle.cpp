@@ -6,6 +6,7 @@
 */
 
 #include "App.hpp"
+#include "Utils.hpp"
 #include "Random.hpp"
 #include "Particle.hpp"
 
@@ -25,37 +26,59 @@ Particle::Particle(float x, float y)
     _shape.setFillColor(sf::Color::Yellow);
 }
 
-void Particle::_bounce() noexcept
+/*
+ * The future position is out of bounds.
+ * We need to find the point where the particle intersects the outer bounds.
+ */
+sf::Vector2f Particle::_intersectCollision(const sf::Vector2f &A, const sf::Vector2f &B) noexcept
 {
-    const auto pos = _shape.getPosition();
+    if (B.y + RADIUS > App::WIN_H) {
+        // Let A be the current position, B the future position (out of bounds),
+        // C the right angle point from A and B,
+        // D the right angle point on the horizontal axis,
+        // Z the intersection point we are trying to find.
+        const auto C = sf::Vector2f{A.x, B.y};
+        const auto D = sf::Vector2f{A.x, App::WIN_H - RADIUS};
+        const auto AD = Utils::distance(A, D);
+        const auto AC = Utils::distance(A, C);
+        const auto CB = Utils::distance(B, C);
+        const auto DZ = (CB / AC) * AD;             // Simplified from std::tan(std::atan(CB / AC)) * AD
+        const auto Z = sf::Vector2f{A.x + DZ, D.y};
 
-    if (pos.x < 0 || pos.x > App::WIN_W)
+        return Z;
+    } else {
+        return B;
+    }
+}
+
+void Particle::_bounce(const sf::Vector2f &future) noexcept
+{
+    if (future.x - RADIUS < 0 || future.x + RADIUS > App::WIN_W)
         _speed.x *= -1.0;
 
-    if (pos.y < 0 || pos.y > App::WIN_H)
+    if (future.y - RADIUS < 0 || future.y + RADIUS > App::WIN_H)
         _speed.y *= -1.0;
 
     // Limit bouncing off the ground, energy loss simulation.
-    if (_gravityEnabled && pos.y > App::WIN_H)
+    if (_gravityEnabled && future.y + RADIUS > App::WIN_H)
         _speed.y *= 0.575;
 }
 
 void Particle::tick(float deltaTime)
 {
-    if (_gravityEnabled) {
+    if (_gravityEnabled)
         _speed.y += GRAVITY * deltaTime;
-    }
 
-    sf::Vector2f moveVec{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
     const auto pos = _shape.getPosition();
-    const auto future = pos + moveVec;
+    auto moveVec = sf::Vector2f{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
+    auto future = pos + moveVec;
 
     if (_isOutOfBounds(future)) {
-        _bounce();
-        moveVec = sf::Vector2f{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
+        _bounce(future);
+        future = _intersectCollision(pos, future);
     }
 
-    _shape.move(moveVec);
+    _shape.setPosition(future);
 }
 
 bool Particle::_isOutOfBounds(const sf::Vector2f &pos) noexcept

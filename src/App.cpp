@@ -90,7 +90,7 @@ void App::_pollEvents()
         if (_event.type == sf::Event::EventType::MouseButtonPressed) {
             const auto pos = sf::Mouse::getPosition(_sfWin);
 
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < 30; ++i) {
                 auto ptr = std::make_unique<Particle>(pos);
 
                 _quadtree.insert(ptr.get());
