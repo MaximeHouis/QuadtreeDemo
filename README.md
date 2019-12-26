@@ -23,6 +23,7 @@ $> ./setup.sh
 * Press **F** to freeze time.
 * Press **G** to toggle gravity on/off.
 * Press **H** to hide/show the quadtree.
+* Press **V** to toggle VSync on/off. (Default: ON)
 * Press **Space** to remove every particles.
 * Press **ESC, DEL or Q** to exit the program.
 

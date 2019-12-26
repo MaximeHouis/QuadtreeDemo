@@ -40,7 +40,7 @@ sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A
     sf::Vector2f C;
     sf::Vector2f D;
 
-    if (bound == UP || bound == DOWN) {
+    if (bound & HORIZONTAL) {
         C = sf::Vector2f{A.x, B.y};
         D = sf::Vector2f{A.x, bound == UP ? RADIUS : App::WIN_H - RADIUS};
     } else {
@@ -53,7 +53,7 @@ sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A
     const auto CB = Utils::distance(B, C);
     const auto DZ = (CB / AC) * AD;         // Simplified from std::tan(std::atan(CB / AC)) * AD
 
-    if (bound == UP || bound == DOWN)
+    if (bound & HORIZONTAL)
         return sf::Vector2f{A.x + DZ, D.y};
     else
         return sf::Vector2f{D.x, A.y + DZ};
@@ -61,10 +61,10 @@ sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A
 
 void Particle::_bounce(Boundary bound) noexcept
 {
-    if (bound == LEFT || bound == RIGHT)
+    if (bound & VERTICAL)
         _speed.x *= -1.0;
 
-    if (bound == UP || bound == DOWN)
+    if (bound & HORIZONTAL)
         _speed.y *= -1.0;
 
     // Limit bouncing off the ground, energy loss simulation.

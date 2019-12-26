@@ -13,7 +13,7 @@
 App::App()
         : _sfWin{sf::VideoMode{WIN_W, WIN_H}, "Quadtree Demo", sf::Style::Close}
 {
-    _sfWin.setVerticalSyncEnabled(true);
+    _sfWin.setVerticalSyncEnabled(_vsync);
 
     _font.loadFromFile("Assets/Fonts/Cascadia.ttf");
 
@@ -71,6 +71,11 @@ void App::_keyPressed(sf::Keyboard::Key code)
 
         case sf::Keyboard::H:
             _drawQuads = !_drawQuads;
+            break;
+
+        case sf::Keyboard::V:
+            _vsync = !_vsync;
+            _sfWin.setVerticalSyncEnabled(_vsync);
             break;
 
         default:

@@ -33,6 +33,7 @@ private:
 
     bool _freeze{false};
     bool _drawQuads{true};
+    bool _vsync{true};
 
     void _keyPressed(sf::Keyboard::Key code);
     void _pollEvents();
