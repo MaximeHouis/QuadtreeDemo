@@ -12,11 +12,11 @@ add_executable(
         quad-demo
         src/Main.cpp
         src/App.cpp include/App.hpp
-        src/Random.cpp include/Random.hpp
         src/FrameManager.cpp include/FrameManager.hpp
-        src/Particle.cpp include/Particle.hpp
-        src/Quadtree.cpp include/Quadtree.hpp
-        src/Utils.cpp include/Utils.hpp
+        src/Core/Particle.cpp include/Core/Particle.hpp
+        src/Core/Quadtree.cpp include/Core/Quadtree.hpp
+        src/Utils/Utils.cpp include/Utils/Utils.hpp
+        src/Utils/Random.cpp include/Utils/Random.hpp
 )
 
 file(COPY Assets DESTINATION ${CMAKE_BINARY_DIR})

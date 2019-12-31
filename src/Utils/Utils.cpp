@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-#include "Utils.hpp"
+#include "Utils/Utils.hpp"
 
 namespace Utils {
     float distance(const sf::Vector2f &a, const sf::Vector2f &b) noexcept

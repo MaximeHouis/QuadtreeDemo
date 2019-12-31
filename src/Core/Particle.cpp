@@ -6,9 +6,9 @@
 */
 
 #include "App.hpp"
-#include "Utils.hpp"
-#include "Random.hpp"
-#include "Particle.hpp"
+#include "Core/Particle.hpp"
+#include "Utils/Utils.hpp"
+#include "Utils/Random.hpp"
 
 bool Particle::_gravityEnabled{false};
 

@@ -11,7 +11,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Utils.hpp"
+#include "Utils/Utils.hpp"
 
 // Binary mask
 #define CHECK_BOUNDARY(boundary, direction) (boundary & direction)

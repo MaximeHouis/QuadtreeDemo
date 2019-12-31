@@ -11,9 +11,9 @@
 
 #include <vector>
 
-#include "Particle.hpp"
 #include "FrameManager.hpp"
-#include "Quadtree.hpp"
+#include "Core/Particle.hpp"
+#include "Core/Quadtree.hpp"
 
 class App final {
 public:

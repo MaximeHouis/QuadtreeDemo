@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-#include "Random.hpp"
+#include "Utils/Random.hpp"
 
 std::random_device Random::_randomDevice{};
 std::mt19937 Random::_gen{_randomDevice()};

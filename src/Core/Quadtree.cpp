@@ -7,8 +7,8 @@
 
 #include <iostream>
 
-#include "Utils.hpp"
-#include "Quadtree.hpp"
+#include "Core/Quadtree.hpp"
+#include "Utils/Utils.hpp"
 
 size_t Quadtree::_MaxUnits{5};
 size_t Quadtree::_MaxDepth{10};
