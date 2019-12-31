@@ -20,6 +20,8 @@ class Quadtree {
 public:
     static size_t _MaxUnits;
     static size_t _MaxDepth;
+
+    using EntityList = Particle::EntityList;
 private:
     struct Children {
         std::unique_ptr<Quadtree> nw{nullptr};
@@ -30,7 +32,7 @@ private:
 
     static std::atomic<size_t> _instanceCount;
 
-    std::vector<const Particle *> _entities{};
+    EntityList _entities{};
     std::unique_ptr<Children> _children{nullptr};
 
     sf::FloatRect _location;
@@ -52,8 +54,6 @@ public:
     void draw(sf::RenderWindow &window) const noexcept;
     void update();
     void clear();
-
-    // TODO: Erase one particle from tree
 
     [[nodiscard]] size_t size() const noexcept;
     [[nodiscard]] size_t count() const noexcept;

@@ -17,6 +17,8 @@
 #define CHECK_BOUNDARY(boundary, direction) (boundary & direction)
 
 class Particle {
+public:
+    using EntityList = std::vector<const Particle *>;
 private:
     enum Boundary : std::uint8_t {
         NONE = 0,
@@ -43,6 +45,8 @@ private:
 
     TimePoint _birthStamp{Clock::now()};
 
+    mutable EntityList *_nearbyEntities{nullptr};
+
     void _bounce(Boundary bound) noexcept;
     Duration _lifetime() const noexcept;
 public:
@@ -51,10 +55,15 @@ public:
     template<typename T>
     explicit Particle(const sf::Vector2<T> &pos)
             : Particle{static_cast<float>(pos.x), static_cast<float>(pos.y)}
-    {
-    }
+    {}
+
+    Particle(const Particle &) = delete;
+    Particle &operator=(const Particle &) = delete;
 
     void tick(float deltaTime);
+
+    void setNearbyEntities(EntityList *nearbyEntities) const noexcept;
+    EntityList *getNearbyEntities() const noexcept;
     const sf::CircleShape &getShape() const noexcept;
 
     static void toggleGravity() noexcept;

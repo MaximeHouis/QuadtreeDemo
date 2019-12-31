@@ -78,6 +78,7 @@ bool Quadtree::insert(const Particle *entity)
     }
 
     _entities.push_back(entity);
+    entity->setNearbyEntities(&_entities);
 
     if (size() > _MaxUnits)
         _split();
@@ -136,8 +137,8 @@ void Quadtree::update()
 
     for (auto &item : purge) {
         if (!insert(item)) {
-            // Shouldn't happen anymore because particle tunneling is now fixed on all boundaries.
             std::cerr << "Insertion failed: " << item->getShape().getPosition() << std::endl;
+            item->setNearbyEntities(nullptr);
         }
     }
 }
@@ -196,3 +197,4 @@ size_t Quadtree::getInstanceCount() noexcept
 {
     return _instanceCount;
 }
+

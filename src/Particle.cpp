@@ -113,11 +113,6 @@ Duration Particle::_lifetime() const noexcept
     return Duration{Clock::now() - _birthStamp};
 }
 
-const sf::CircleShape &Particle::getShape() const noexcept
-{
-    return _shape;
-}
-
 void Particle::toggleGravity() noexcept
 {
     _gravityEnabled = !_gravityEnabled;
@@ -131,4 +126,19 @@ bool Particle::isGravityEnabled() noexcept
 void Particle::setGravityEnabled(bool gravityEnabled) noexcept
 {
     _gravityEnabled = gravityEnabled;
+}
+
+void Particle::setNearbyEntities(EntityList *nearbyEntities) const noexcept
+{
+    _nearbyEntities = nearbyEntities;
+}
+
+Particle::EntityList *Particle::getNearbyEntities() const noexcept
+{
+    return _nearbyEntities;
+}
+
+const sf::CircleShape &Particle::getShape() const noexcept
+{
+    return _shape;
 }
