@@ -7,9 +7,16 @@
 
 #pragma once
 
+#include <chrono>
 #include <iostream>
 
 #include <SFML/System/Vector2.hpp>
+
+using Clock = std::chrono::system_clock;
+using Duration = std::chrono::duration<double>;
+using TimePoint = decltype(Clock::now());
+
+using namespace std::chrono_literals;
 
 template<typename T>
 std::ostream &operator<<(std::ostream &os, const sf::Vector2<T> &vec)

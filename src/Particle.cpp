@@ -15,8 +15,10 @@ bool Particle::_gravityEnabled{false};
 Particle::Particle(float x, float y)
         : _shape{}, _speed{}
 {
-    const auto dx = static_cast<float>(Random::getDouble(-1, 1) * (Random::getBool() ? 1.0 : -1.0));
-    const auto dy = static_cast<float>((1.0f - std::fabs(dx)) * (Random::getBool() ? 1.0 : -1.0));
+    const auto angle = Random::range() * 2.0 * M_PI;
+    const auto amplitude = std::sqrt(Random::range());
+    const auto dx = static_cast<float>(amplitude * std::cos(angle));
+    const auto dy = static_cast<float>(amplitude * std::sin(angle));
 
     _speed = sf::Vector2f{dx, dy};
 
@@ -40,7 +42,7 @@ sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A
     sf::Vector2f C;
     sf::Vector2f D;
 
-    if (bound & HORIZONTAL) {
+    if (CHECK_BOUNDARY(bound, HORIZONTAL)) {
         C = sf::Vector2f{A.x, B.y};
         D = sf::Vector2f{A.x, bound == UP ? RADIUS : App::WIN_H - RADIUS};
     } else {
@@ -53,7 +55,7 @@ sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A
     const auto CB = Utils::distance(B, C);
     const auto DZ = (CB / AC) * AD;         // Simplified from std::tan(std::atan(CB / AC)) * AD
 
-    if (bound & HORIZONTAL)
+    if (CHECK_BOUNDARY(bound, HORIZONTAL))
         return sf::Vector2f{A.x + DZ, D.y};
     else
         return sf::Vector2f{D.x, A.y + DZ};
@@ -61,10 +63,10 @@ sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A
 
 void Particle::_bounce(Boundary bound) noexcept
 {
-    if (bound & VERTICAL)
+    if (CHECK_BOUNDARY(bound, VERTICAL))
         _speed.x *= -1.0;
 
-    if (bound & HORIZONTAL)
+    if (CHECK_BOUNDARY(bound, HORIZONTAL))
         _speed.y *= -1.0;
 
     // Limit bouncing off the ground, energy loss simulation.
@@ -78,7 +80,7 @@ void Particle::tick(float deltaTime)
         _speed.y += GRAVITY * deltaTime;
 
     const auto pos = _shape.getPosition();
-    auto moveVec = sf::Vector2f{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
+    const auto moveVec = sf::Vector2f{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
     auto future = pos + moveVec;
 
     if (const auto bound = _isOutOfBounds(future)) {
@@ -104,6 +106,11 @@ Particle::Boundary Particle::_isOutOfBounds(const sf::Vector2f &pos) noexcept
         return Boundary::LEFT;
 
     return Boundary::NONE;
+}
+
+Duration Particle::_lifetime() const noexcept
+{
+    return Duration{Clock::now() - _birthStamp};
 }
 
 const sf::CircleShape &Particle::getShape() const noexcept

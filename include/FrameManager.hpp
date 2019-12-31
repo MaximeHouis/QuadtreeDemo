@@ -11,13 +11,9 @@
 #include <optional>
 #include <functional>
 
-using namespace std::chrono_literals;
+#include "Utils.hpp"
 
 class FrameManager {
-public:
-    using Clock = std::chrono::system_clock;
-    using Duration = std::chrono::duration<double>;
-    using TimePoint = decltype(Clock::now());
 private:
     static bool _highResFpsCounter;
 

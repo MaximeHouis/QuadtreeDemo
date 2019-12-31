@@ -7,7 +7,14 @@
 
 #pragma once
 
+#include <cmath>
+
 #include <SFML/Graphics.hpp>
+
+#include "Utils.hpp"
+
+// Binary mask
+#define CHECK_BOUNDARY(boundary, direction) (boundary & direction)
 
 class Particle {
 private:
@@ -34,7 +41,10 @@ private:
     sf::CircleShape _shape;
     sf::Vector2f _speed;
 
+    TimePoint _birthStamp{Clock::now()};
+
     void _bounce(Boundary bound) noexcept;
+    Duration _lifetime() const noexcept;
 public:
     Particle(float x, float y);
 

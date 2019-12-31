@@ -13,14 +13,23 @@
 App::App()
         : _sfWin{sf::VideoMode{WIN_W, WIN_H}, "Quadtree Demo", sf::Style::Close}
 {
+    static const auto color = sf::Color::Yellow;    // Cannot be constexpr :c
+    constexpr auto fontSize = 16;
+
     _sfWin.setVerticalSyncEnabled(_vsync);
 
     _font.loadFromFile("Assets/Fonts/Cascadia.ttf");
 
-    _statsText.setFont(_font);
-    _statsText.setFillColor(sf::Color::Yellow);
-    _statsText.setPosition(10, 10);
-    _statsText.setCharacterSize(21);
+    _dataText.setFont(_font);
+    _dataText.setCharacterSize(fontSize);
+    _dataText.setFillColor(color);
+    _dataText.setPosition(10, 10);
+
+    _updateStatus();
+    _statusText.setFont(_font);
+    _statusText.setCharacterSize(fontSize);
+    _statusText.setFillColor(color);
+    _statusText.setPosition(10, WIN_H - _statusText.getGlobalBounds().height - _statusText.getLineSpacing() - 10);
 
     _frameManager.onSecond([&] {
         const auto quads = Quadtree::getInstanceCount();
@@ -29,11 +38,21 @@ App::App()
         ss <<
            _frameManager.getFramerate() << " fps\n" <<
            _particles.size() << " entities\n" <<
-           quads << " quad" << (quads != 1 ? "s" : "") << "\n" <<
-           "Gravity: " << (Particle::isGravityEnabled() ? "on" : "off");
+           quads << " quad" << (quads != 1 ? "s" : "");
 
-        _statsText.setString(ss.str());
+        _dataText.setString(ss.str());
     });
+}
+
+void App::_updateStatus()
+{
+    std::stringstream ss;
+
+    ss << std::boolalpha
+       << "V-Sync: " << _vsync << '\n'
+       << "Gravity: " << Particle::isGravityEnabled();
+
+    _statusText.setString(ss.str());
 }
 
 void App::run()
@@ -61,6 +80,10 @@ void App::_keyPressed(sf::Keyboard::Key code)
             _sfWin.close();
             break;
 
+        case sf::Keyboard::T:
+            _drawText = !_drawText;
+            break;
+
         case sf::Keyboard::F:
             _freeze = !_freeze;
             break;
@@ -81,6 +104,8 @@ void App::_keyPressed(sf::Keyboard::Key code)
         default:
             break;
     }
+
+    _updateStatus();
 }
 
 void App::_pollEvents()
@@ -95,7 +120,7 @@ void App::_pollEvents()
         if (_event.type == sf::Event::EventType::MouseButtonPressed) {
             const auto pos = sf::Mouse::getPosition(_sfWin);
 
-            for (int i = 0; i < 30; ++i) {
+            for (int i = 0; i < PARTICLE_CLICK_COUNT; ++i) {
                 auto ptr = std::make_unique<Particle>(pos);
 
                 _quadtree.insert(ptr.get());
@@ -128,7 +153,11 @@ void App::_render()
 
     if (_drawQuads)
         _quadtree.draw(_sfWin);
-    _sfWin.draw(_statsText);
+
+    if (_drawText) {
+        _sfWin.draw(_dataText);
+        _sfWin.draw(_statusText);
+    }
 
     _sfWin.display();
 }

@@ -21,7 +21,7 @@ Quadtree::Quadtree(const sf::FloatRect &location, size_t depth)
     ++_instanceCount;
 
     _visual.setOutlineThickness(1.f);
-    _visual.setOutlineColor(sf::Color::Yellow);
+    _visual.setOutlineColor(sf::Color{255, 255, 0, 127});
     _visual.setFillColor(sf::Color::Transparent);
     _visual.setPosition(_location.left, _location.top);
     _visual.setSize(sf::Vector2f{_location.width, _location.height});

@@ -17,28 +17,33 @@
 
 class App final {
 public:
-    static constexpr const auto WIN_W{1000u};
-    static constexpr const auto WIN_H{1000u};
+    static constexpr auto WIN_W{1000u};
+    static constexpr auto WIN_H{WIN_W};
 private:
+    static constexpr auto PARTICLE_CLICK_COUNT{15};
+
     FrameManager _frameManager{};
 
     sf::RenderWindow _sfWin;
     sf::Event _event{};
 
     sf::Font _font{};
-    sf::Text _statsText{};
+    sf::Text _dataText{};
+    sf::Text _statusText{};
 
     std::vector<std::unique_ptr<Particle>> _particles{};
     Quadtree _quadtree{0, 0, WIN_W, WIN_H, 0};
 
     bool _freeze{false};
-    bool _drawQuads{true};
+    bool _drawQuads{false};
     bool _vsync{true};
+    bool _drawText{true};
 
     void _keyPressed(sf::Keyboard::Key code);
     void _pollEvents();
     void _tick();
     void _render();
+    void _updateStatus();
 public:
     App();
 
