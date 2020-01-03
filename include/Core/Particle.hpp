@@ -10,8 +10,10 @@
 #include <cmath>
 
 #include <SFML/Graphics.hpp>
+#include <atomic>
 
 #include "Utils/Utils.hpp"
+#include "Utils/Random.hpp"
 
 // Binary mask
 #define CHECK_BOUNDARY(boundary, direction) (boundary & direction)
@@ -31,24 +33,28 @@ private:
         VERTICAL = LEFT | RIGHT
     };
 
-    static constexpr const auto MAX_SPEED = 275.f;
-    static constexpr const auto GRAVITY = 9.81f;
-    static constexpr const auto RADIUS = 2.5f;
+    static constexpr const auto GRAVITY{9.81f};
+    static constexpr const auto MAX_SPEED{275.f};
 
     static bool _gravityEnabled;
+    static std::atomic_uint64_t _collisionCount;
 
-    static sf::Vector2f _intersectCollision(Boundary bound, const sf::Vector2f &A, const sf::Vector2f &B) noexcept;
-    static Boundary _isOutOfBounds(const sf::Vector2f &pos) noexcept;
+    // Let's pretend the mass is the area of the circle
+    const float _radius{static_cast<float>(Random::getDouble(2.5, 5.0))};
+    const float _mass{static_cast<float>(M_PI * std::pow(_radius, 2))};
 
-    sf::CircleShape _shape;
-    sf::Vector2f _speed;
+    // TODO: Only _nearbyEntities should be mutable.
+    mutable EntityList *_nearbyEntities{nullptr};
+    mutable sf::Vector2f _speed{};
+    mutable sf::CircleShape _shape{};
 
     TimePoint _birthStamp{Clock::now()};
 
-    mutable EntityList *_nearbyEntities{nullptr};
-
-    void _bounce(Boundary bound) noexcept;
     Duration _lifetime() const noexcept;
+    void _bounceNearby();
+    void _bounceBoundaries(Boundary bound) noexcept;
+    sf::Vector2f _intersectCollision(Boundary bound, const sf::Vector2f &A, const sf::Vector2f &B) noexcept;
+    Boundary _isOutOfBounds(const sf::Vector2f &pos) noexcept;
 public:
     Particle(float x, float y);
 
@@ -69,4 +75,5 @@ public:
     static void toggleGravity() noexcept;
     static bool isGravityEnabled() noexcept;
     static void setGravityEnabled(bool gravityEnabled) noexcept;
+    static std::uint64_t getCollisionCount() noexcept;
 };

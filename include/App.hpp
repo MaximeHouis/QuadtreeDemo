@@ -20,7 +20,7 @@ public:
     static constexpr auto WIN_W{1000u};
     static constexpr auto WIN_H{WIN_W};
 private:
-    static constexpr auto PARTICLE_CLICK_COUNT{15};
+    static constexpr auto PARTICLE_CLICK_COUNT{150};
 
     FrameManager _frameManager{};
 
@@ -28,8 +28,8 @@ private:
     sf::Event _event{};
 
     sf::Font _font{};
-    sf::Text _dataText{};
-    sf::Text _statusText{};
+    sf::Text _dataTxt{};
+    sf::Text _statusTxt{};
 
     std::vector<std::unique_ptr<Particle>> _particles{};
     Quadtree _quadtree{0, 0, WIN_W, WIN_H, 0};

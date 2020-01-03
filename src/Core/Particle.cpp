@@ -8,12 +8,11 @@
 #include "App.hpp"
 #include "Core/Particle.hpp"
 #include "Utils/Utils.hpp"
-#include "Utils/Random.hpp"
 
 bool Particle::_gravityEnabled{false};
+std::atomic_uint64_t Particle::_collisionCount{0};
 
 Particle::Particle(float x, float y)
-        : _shape{}, _speed{}
 {
     const auto angle = Random::range() * 2.0 * M_PI;
     const auto amplitude = std::sqrt(Random::range());
@@ -22,10 +21,66 @@ Particle::Particle(float x, float y)
 
     _speed = sf::Vector2f{dx, dy};
 
-    _shape.setRadius(RADIUS);
+    _shape.setRadius(_radius);
     _shape.setPosition(x, y);
-    _shape.setOrigin(sf::Vector2f{RADIUS / 2.f, RADIUS / 2.f});
+    _shape.setOrigin(sf::Vector2f{_radius / 2.f, _radius / 2.f});
     _shape.setFillColor(sf::Color::Yellow);
+}
+
+void Particle::_bounceNearby()
+{
+    if (_nearbyEntities == nullptr || _lifetime() < 750ms)
+        return;
+
+    for (auto &near : *_nearbyEntities) {
+        if (near == nullptr || near == this)
+            continue;
+
+        if (_shape.getGlobalBounds().intersects(near->getShape().getGlobalBounds())) {
+            ++_collisionCount;
+
+            // Credits: substitute541 - http://blogs.love2d.org/content/circle-collisions
+            // FIXME: Sometimes particles will not detach for some time
+
+            {
+                const auto massDiff{_mass - near->_mass};
+                const auto massTotal{_mass + near->_mass};
+                const auto totalSpeed{sf::Vector2f{_speed.x - near->_speed.x,
+                                                   _speed.y - near->_speed.y}};
+                const auto newSpeedThis{sf::Vector2f{
+                        (_speed.x * massDiff + (2.0f * near->_mass * near->_speed.x)) / massTotal,
+                        (_speed.y * massDiff + (2.0f * near->_mass * near->_speed.y)) / massTotal}};
+                const auto newSpeedNear{totalSpeed + newSpeedThis};
+
+                this->_speed = newSpeedThis;
+                near->_speed = newSpeedNear;
+            }
+            {
+                const auto posThis{this->_shape.getPosition()};
+                const auto posNear{near->_shape.getPosition()};
+                const auto midpoint{sf::Vector2f{(posThis.x + posNear.x) / 2.f, (posThis.y + posNear.y) / 2.f}};
+                const auto dist{Utils::distance(posThis, posNear)};
+
+                this->_shape.setPosition(midpoint.x + this->_radius * (posThis.x - posNear.x) / dist,
+                                         midpoint.y + this->_radius * (posThis.y - posNear.y) / dist);
+                near->_shape.setPosition(midpoint.x + near->_radius * (posNear.x - posThis.x) / dist,
+                                         midpoint.y + near->_radius * (posNear.y - posThis.y) / dist);
+            }
+        }
+    }
+}
+
+void Particle::_bounceBoundaries(Boundary bound) noexcept
+{
+    if (CHECK_BOUNDARY(bound, VERTICAL))
+        _speed.x *= -1.0;
+
+    if (CHECK_BOUNDARY(bound, HORIZONTAL))
+        _speed.y *= -1.0;
+
+    // Limit bouncing off the ground, energy loss simulation.
+    if (_gravityEnabled && bound == DOWN)
+        _speed.y *= Random::getDouble(0.55, 0.65);
 }
 
 /*
@@ -44,34 +99,33 @@ sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A
 
     if (CHECK_BOUNDARY(bound, HORIZONTAL)) {
         C = sf::Vector2f{A.x, B.y};
-        D = sf::Vector2f{A.x, bound == UP ? RADIUS : App::WIN_H - RADIUS};
+        D = sf::Vector2f{A.x, bound == UP ? _radius : App::WIN_H - _radius};
     } else {
         C = sf::Vector2f{B.x, A.y};
-        D = sf::Vector2f{bound == LEFT ? RADIUS : App::WIN_W - RADIUS, A.y};
+        D = sf::Vector2f{bound == LEFT ? _radius : App::WIN_W - _radius, A.y};
     }
 
     const auto AD = Utils::distance(A, D);
     const auto AC = Utils::distance(A, C);
     const auto CB = Utils::distance(B, C);
-    const auto DZ = (CB / AC) * AD;         // Simplified from std::tan(std::atan(CB / AC)) * AD
+    const auto DZ = (CB / AC) * AD;
+    // Simplified from std::tan(std::atan(CB / AC)) * AD
+
+    sf::Vector2f future{};
 
     if (CHECK_BOUNDARY(bound, HORIZONTAL))
-        return sf::Vector2f{A.x + DZ, D.y};
+        future = sf::Vector2f{A.x + DZ, D.y};
     else
-        return sf::Vector2f{D.x, A.y + DZ};
-}
+        future = sf::Vector2f{D.x, A.y + DZ};
 
-void Particle::_bounce(Boundary bound) noexcept
-{
-    if (CHECK_BOUNDARY(bound, VERTICAL))
-        _speed.x *= -1.0;
+    // Happens when adjusted position is colliding with another boundary.
+    if (const auto boundary = _isOutOfBounds(future)) {
+        future = _intersectCollision(boundary, A, future);
+        if (_isOutOfBounds(future))
+            std::cerr << "Still out of bounds :(" << std::endl;
+    }
 
-    if (CHECK_BOUNDARY(bound, HORIZONTAL))
-        _speed.y *= -1.0;
-
-    // Limit bouncing off the ground, energy loss simulation.
-    if (_gravityEnabled && bound == DOWN)
-        _speed.y *= 0.575;
+    return future;
 }
 
 void Particle::tick(float deltaTime)
@@ -79,13 +133,18 @@ void Particle::tick(float deltaTime)
     if (_gravityEnabled)
         _speed.y += GRAVITY * deltaTime;
 
+//    _bounceNearby();
+
     const auto pos = _shape.getPosition();
     const auto moveVec = sf::Vector2f{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
     auto future = pos + moveVec;
 
     if (const auto bound = _isOutOfBounds(future)) {
-        _bounce(bound);
+        _bounceBoundaries(bound);
         future = _intersectCollision(bound, pos, future);
+
+        if (future.y == pos.y) // We are on the ground, reset speed.
+            _speed = {0, 0};
     }
 
     _shape.setPosition(future);
@@ -93,16 +152,16 @@ void Particle::tick(float deltaTime)
 
 Particle::Boundary Particle::_isOutOfBounds(const sf::Vector2f &pos) noexcept
 {
-    if (pos.y - RADIUS < 0)
+    if (pos.y - _radius < 0)
         return Boundary::UP;
 
-    if (pos.x + RADIUS > App::WIN_W)
+    if (pos.x + _radius > App::WIN_W)
         return Boundary::RIGHT;
 
-    if (pos.y + RADIUS > App::WIN_H)
+    if (pos.y + _radius > App::WIN_H)
         return Boundary::DOWN;
 
-    if (pos.x - RADIUS < 0)
+    if (pos.x - _radius < 0)
         return Boundary::LEFT;
 
     return Boundary::NONE;
@@ -141,4 +200,9 @@ Particle::EntityList *Particle::getNearbyEntities() const noexcept
 const sf::CircleShape &Particle::getShape() const noexcept
 {
     return _shape;
+}
+
+std::uint64_t Particle::getCollisionCount() noexcept
+{
+    return _collisionCount;
 }

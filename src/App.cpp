@@ -15,32 +15,35 @@ App::App()
 {
     static const auto color = sf::Color::Yellow;    // Cannot be constexpr :c
     constexpr auto fontSize = 16;
+    constexpr auto margin = 10;
 
     _sfWin.setVerticalSyncEnabled(_vsync);
 
     _font.loadFromFile("Assets/Fonts/Cascadia.ttf");
 
-    _dataText.setFont(_font);
-    _dataText.setCharacterSize(fontSize);
-    _dataText.setFillColor(color);
-    _dataText.setPosition(10, 10);
+    _dataTxt.setFont(_font);
+    _dataTxt.setCharacterSize(fontSize);
+    _dataTxt.setFillColor(color);
+    _dataTxt.setPosition(margin, margin);
 
     _updateStatus();
-    _statusText.setFont(_font);
-    _statusText.setCharacterSize(fontSize);
-    _statusText.setFillColor(color);
-    _statusText.setPosition(10, WIN_H - _statusText.getGlobalBounds().height - _statusText.getLineSpacing() - 10);
+    _statusTxt.setFont(_font);
+    _statusTxt.setCharacterSize(fontSize);
+    _statusTxt.setFillColor(color);
+    _statusTxt.setPosition(margin, WIN_H - _statusTxt.getGlobalBounds().height - _statusTxt.getLineSpacing() - margin);
 
     _frameManager.onSecond([&] {
         const auto quads = Quadtree::getInstanceCount();
-        std::stringstream ss;
+        const auto collisions = Particle::getCollisionCount();
 
+        std::stringstream ss;
         ss <<
            _frameManager.getFramerate() << " fps\n" <<
            _particles.size() << " entities\n" <<
-           quads << " quad" << (quads != 1 ? "s" : "");
+           quads << " quad" << (quads != 1 ? "s" : "") << '\n' <<
+           collisions << " collision" << (collisions != 1 ? "s" : "") << '\n';
 
-        _dataText.setString(ss.str());
+        _dataTxt.setString(ss.str());
     });
 }
 
@@ -52,7 +55,7 @@ void App::_updateStatus()
        << "V-Sync: " << _vsync << '\n'
        << "Gravity: " << Particle::isGravityEnabled();
 
-    _statusText.setString(ss.str());
+    _statusTxt.setString(ss.str());
 }
 
 void App::run()
@@ -155,8 +158,8 @@ void App::_render()
         _quadtree.draw(_sfWin);
 
     if (_drawText) {
-        _sfWin.draw(_dataText);
-        _sfWin.draw(_statusText);
+        _sfWin.draw(_dataTxt);
+        _sfWin.draw(_statusTxt);
     }
 
     _sfWin.display();
