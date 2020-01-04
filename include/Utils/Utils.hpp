@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <chrono>
 #include <iostream>
 
@@ -25,5 +26,9 @@ std::ostream &operator<<(std::ostream &os, const sf::Vector2<T> &vec)
 }
 
 namespace Utils {
-    float distance(const sf::Vector2f &a, const sf::Vector2f &b) noexcept;
+    template<typename T>
+    auto distance(const sf::Vector2<T> &a, const sf::Vector2<T> &b) noexcept
+    {
+        return static_cast<T>(std::sqrt(std::pow(b.x - a.x, 2) + std::pow(b.y - a.y, 2)));
+    }
 }

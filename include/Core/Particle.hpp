@@ -15,9 +15,6 @@
 #include "Utils/Utils.hpp"
 #include "Utils/Random.hpp"
 
-// Binary mask
-#define CHECK_BOUNDARY(boundary, direction) (boundary & direction)
-
 class Particle {
 public:
     using EntityList = std::vector<const Particle *>;
@@ -39,6 +36,11 @@ private:
     static bool _gravityEnabled;
     static std::atomic_uint64_t _collisionCount;
 
+    static constexpr inline auto CHECK_BOUNDARY(Boundary boundary, Boundary direction)
+    {
+        return boundary & direction;
+    }
+
     // Let's pretend the mass is the area of the circle
     const float _radius{static_cast<float>(Random::getDouble(2.5, 5.0))};
     const float _mass{static_cast<float>(M_PI * std::pow(_radius, 2))};
@@ -53,8 +55,8 @@ private:
     Duration _lifetime() const noexcept;
     void _bounceNearby();
     void _bounceBoundaries(Boundary bound) noexcept;
-    sf::Vector2f _intersectCollision(Boundary bound,
-                                     const sf::Vector2f &A, const sf::Vector2f &B, std::uint8_t depth = 0) noexcept;
+    sf::Vector2f _intersectCollision(Boundary bound, const sf::Vector2f &A, const sf::Vector2f &B,
+                                     std::uint8_t depth = 0) noexcept;
     Boundary _isOutOfBounds(const sf::Vector2f &pos) noexcept;
 public:
     Particle(float x, float y);

@@ -87,8 +87,7 @@ void Particle::_bounceBoundaries(Boundary bound) noexcept
  * The future position is out of bounds.
  * We need to find the point where the particle intersects the outer bounds.
  */
-sf::Vector2f Particle::_intersectCollision(Boundary bound,
-                                           const sf::Vector2f &A, const sf::Vector2f &B,
+sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A, const sf::Vector2f &B,
                                            std::uint8_t depth) noexcept
 {
     // Let A be the current position, B the future position (out of bounds),

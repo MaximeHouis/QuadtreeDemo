@@ -58,17 +58,6 @@ void App::_updateStatus()
     _statusTxt.setString(ss.str());
 }
 
-void App::run()
-{
-    while (_sfWin.isOpen()) {
-        _pollEvents();
-        _tick();
-        _render();
-
-        _frameManager.update();
-    }
-}
-
 void App::_keyPressed(sf::Keyboard::Key code)
 {
     switch (code) {
@@ -163,4 +152,15 @@ void App::_render()
     }
 
     _sfWin.display();
+}
+
+void App::run()
+{
+    while (_sfWin.isOpen()) {
+        _pollEvents();
+        _tick();
+        _render();
+
+        _frameManager.update();
+    }
 }
