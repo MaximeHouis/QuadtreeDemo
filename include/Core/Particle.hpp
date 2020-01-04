@@ -53,7 +53,8 @@ private:
     Duration _lifetime() const noexcept;
     void _bounceNearby();
     void _bounceBoundaries(Boundary bound) noexcept;
-    sf::Vector2f _intersectCollision(Boundary bound, const sf::Vector2f &A, const sf::Vector2f &B) noexcept;
+    sf::Vector2f _intersectCollision(Boundary bound,
+                                     const sf::Vector2f &A, const sf::Vector2f &B, std::uint8_t depth = 0) noexcept;
     Boundary _isOutOfBounds(const sf::Vector2f &pos) noexcept;
 public:
     Particle(float x, float y);
