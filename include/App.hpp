@@ -39,11 +39,12 @@ private:
     bool _vsync{true};
     bool _drawText{true};
 
+    void _updateStatus();
+    void _mousePressed();
     void _keyPressed(sf::Keyboard::Key code);
     void _pollEvents();
     void _tick();
     void _render();
-    void _updateStatus();
 public:
     App();
 

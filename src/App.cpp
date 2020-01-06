@@ -100,24 +100,33 @@ void App::_keyPressed(sf::Keyboard::Key code)
     _updateStatus();
 }
 
+void App::_mousePressed()
+{
+    const auto pos = sf::Mouse::getPosition(_sfWin);
+
+    for (int i = 0; i < PARTICLE_CLICK_COUNT; ++i) {
+        auto ptr = std::make_unique<Particle>(pos);
+
+        _quadtree.insert(ptr.get());
+        _particles.push_back(std::move(ptr));
+    }
+}
+
 void App::_pollEvents()
 {
     while (_sfWin.pollEvent(_event)) {
-        if (_event.type == sf::Event::Closed)
-            _sfWin.close();
-
-        if (_event.type == sf::Event::KeyPressed)
-            _keyPressed(_event.key.code);
-
-        if (_event.type == sf::Event::EventType::MouseButtonPressed) {
-            const auto pos = sf::Mouse::getPosition(_sfWin);
-
-            for (int i = 0; i < PARTICLE_CLICK_COUNT; ++i) {
-                auto ptr = std::make_unique<Particle>(pos);
-
-                _quadtree.insert(ptr.get());
-                _particles.push_back(std::move(ptr));
-            }
+        switch (_event.type) {
+            case sf::Event::Closed:
+                _sfWin.close();
+                break;
+            case sf::Event::KeyPressed:
+                _keyPressed(_event.key.code);
+                break;
+            case sf::Event::MouseButtonPressed:
+                _mousePressed();
+                break;
+            default:
+                break;
         }
     }
 }
