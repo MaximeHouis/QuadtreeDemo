@@ -13,7 +13,7 @@
 
 #include "Utils/Utils.hpp"
 
-class FrameManager {
+class FrameManager final {
 private:
     static bool _highResFpsCounter;
 

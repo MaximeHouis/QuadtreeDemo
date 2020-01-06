@@ -16,7 +16,7 @@
 
 #include "Particle.hpp"
 
-class Quadtree {
+class Quadtree final {
 public:
     static size_t _MaxUnits;
     static size_t _MaxDepth;

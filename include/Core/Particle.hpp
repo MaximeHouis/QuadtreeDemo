@@ -8,14 +8,14 @@
 #pragma once
 
 #include <cmath>
+#include <atomic>
 
 #include <SFML/Graphics.hpp>
-#include <atomic>
 
 #include "Utils/Utils.hpp"
 #include "Utils/Random.hpp"
 
-class Particle {
+class Particle final {
 public:
     using EntityList = std::vector<const Particle *>;
 private:

@@ -28,7 +28,7 @@ Quadtree::Quadtree(const sf::FloatRect &location, size_t depth)
 }
 
 Quadtree::Quadtree(float x, float y, float w, float h, size_t depth)
-        : Quadtree(sf::FloatRect{x, y, w, h}, depth)
+        : Quadtree{sf::FloatRect{x, y, w, h}, depth}
 {
 }
 
