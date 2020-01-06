@@ -9,8 +9,9 @@
 #include "Core/Particle.hpp"
 #include "Utils/Utils.hpp"
 
-bool Particle::_gravityEnabled{false};
-std::atomic_uint64_t Particle::_collisionCount{0};
+bool Particle::GravityEnabled{false};
+std::atomic_uint64_t Particle::CollisionCount{0};
+const sf::Vector2f Particle::NullVector{0, 0};
 
 Particle::Particle(float x, float y)
 {
@@ -37,7 +38,7 @@ void Particle::_bounceNearby()
             continue;
 
         if (_shape.getGlobalBounds().intersects(near->getShape().getGlobalBounds())) {
-            ++_collisionCount;
+            ++CollisionCount;
 
             // Credits: substitute541 - http://blogs.love2d.org/content/circle-collisions
             // FIXME: Sometimes particles will not detach for some time
@@ -79,7 +80,7 @@ void Particle::_bounceBoundaries(Boundary bound) noexcept
         _speed.y *= -1.0;
 
     // Limit bouncing off the ground, energy loss simulation.
-    if (_gravityEnabled && bound == DOWN)
+    if (GravityEnabled && bound == DOWN)
         _speed.y *= Random::getDouble(0.55, 0.65);
 }
 
@@ -133,7 +134,7 @@ sf::Vector2f Particle::_intersectCollision(Boundary bound, const sf::Vector2f &A
 
 void Particle::tick(float deltaTime)
 {
-    if (_gravityEnabled)
+    if (GravityEnabled && _speed != NullVector)
         _speed.y += GRAVITY * deltaTime;
 
 //    _bounceNearby();
@@ -147,7 +148,7 @@ void Particle::tick(float deltaTime)
         future = _intersectCollision(bound, pos, future);
 
         if (future.y == pos.y) // We are on the ground, reset speed.
-            _speed = {0, 0};
+            _speed = NullVector;
     }
 
     _shape.setPosition(future);
@@ -177,17 +178,17 @@ Duration Particle::_lifetime() const noexcept
 
 void Particle::toggleGravity() noexcept
 {
-    _gravityEnabled = !_gravityEnabled;
+    GravityEnabled = !GravityEnabled;
 }
 
 bool Particle::isGravityEnabled() noexcept
 {
-    return _gravityEnabled;
+    return GravityEnabled;
 }
 
 void Particle::setGravityEnabled(bool gravityEnabled) noexcept
 {
-    _gravityEnabled = gravityEnabled;
+    GravityEnabled = gravityEnabled;
 }
 
 void Particle::setNearbyEntities(EntityList *nearbyEntities) const noexcept
@@ -207,5 +208,5 @@ const sf::CircleShape &Particle::getShape() const noexcept
 
 std::uint64_t Particle::getCollisionCount() noexcept
 {
-    return _collisionCount;
+    return CollisionCount;
 }

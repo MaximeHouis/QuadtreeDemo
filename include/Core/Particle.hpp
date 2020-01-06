@@ -33,8 +33,9 @@ private:
     static constexpr const auto GRAVITY{9.81f};
     static constexpr const auto MAX_SPEED{275.f};
 
-    static bool _gravityEnabled;
-    static std::atomic_uint64_t _collisionCount;
+    static bool GravityEnabled;
+    static std::atomic_uint64_t CollisionCount;
+    static const sf::Vector2f NullVector;
 
     static constexpr inline auto CHECK_BOUNDARY(Boundary boundary, Boundary direction)
     {
