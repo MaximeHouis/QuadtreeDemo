@@ -36,12 +36,17 @@ void Particle::_bounceNearby()
         if (near == nullptr || near == this)
             continue;
 
-        const auto dist = Utils::distance(_shape.getPosition(), near->_shape.getPosition());
+        const auto posThis = this->_shape.getPosition();
+        const auto posNear = near->_shape.getPosition();
+        const auto dist = Utils::distance(posThis, posNear);
+
         if (dist <= _radius + near->_radius) {
             // Credits: substitute541 - http://blogs.love2d.org/content/circle-collisions
             // Improved and tweaked for this program
 
             {
+                // Bounce particles
+
                 const auto massDiff{_mass - near->_mass};
                 const auto massTotal{_mass + near->_mass};
                 const auto totalSpeed{sf::Vector2f{_speed.x - near->_speed.x,
@@ -55,10 +60,9 @@ void Particle::_bounceNearby()
                 near->_speed = newSpeedNear;
             }
             {
-                const auto posThis{this->_shape.getPosition()};
-                const auto posNear{near->_shape.getPosition()};
+                // Re-adjust positions so they don't overlap
+
                 const auto midpoint{sf::Vector2f{(posThis.x + posNear.x) / 2.f, (posThis.y + posNear.y) / 2.f}};
-                const auto dist{Utils::distance(posThis, posNear)};
 
                 this->_shape.setPosition(midpoint.x + this->_radius * (posThis.x - posNear.x) / dist,
                                          midpoint.y + this->_radius * (posThis.y - posNear.y) / dist);
