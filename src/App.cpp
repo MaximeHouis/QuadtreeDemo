@@ -24,24 +24,26 @@ App::App()
     _dataTxt.setFont(_font);
     _dataTxt.setCharacterSize(fontSize);
     _dataTxt.setFillColor(color);
+    _dataTxt.setOutlineThickness(1.f);
+    _dataTxt.setOutlineColor(sf::Color::Black);
     _dataTxt.setPosition(margin, margin);
 
     _updateStatus();
     _statusTxt.setFont(_font);
     _statusTxt.setCharacterSize(fontSize);
     _statusTxt.setFillColor(color);
+    _statusTxt.setOutlineThickness(1.f);
+    _statusTxt.setOutlineColor(sf::Color::Black);
     _statusTxt.setPosition(margin, WIN_H - _statusTxt.getGlobalBounds().height - _statusTxt.getLineSpacing() - margin);
 
     _frameManager.onSecond([&] {
         const auto quads = Quadtree::getInstanceCount();
-        const auto collisions = Particle::getCollisionCount();
 
         std::stringstream ss;
         ss <<
            _frameManager.getFramerate() << " fps\n" <<
            _particles.size() << " entities\n" <<
-           quads << " quad" << (quads != 1 ? "s" : "") << '\n' <<
-           collisions << " collision" << (collisions != 1 ? "s" : "") << '\n';
+           quads << " quad" << (quads != 1 ? "s" : "") << '\n';
 
         _dataTxt.setString(ss.str());
     });

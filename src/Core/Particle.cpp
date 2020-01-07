@@ -10,7 +10,6 @@
 #include "Utils/Utils.hpp"
 
 bool Particle::GravityEnabled{false};
-std::atomic_uint64_t Particle::CollisionCount{0};
 const sf::Vector2f Particle::NullVector{0, 0};
 
 Particle::Particle(float x, float y)
@@ -37,11 +36,10 @@ void Particle::_bounceNearby()
         if (near == nullptr || near == this)
             continue;
 
-        if (_shape.getGlobalBounds().intersects(near->getShape().getGlobalBounds())) {
-            ++CollisionCount;
-
+        const auto dist = Utils::distance(_shape.getPosition(), near->_shape.getPosition());
+        if (dist <= _radius + near->_radius) {
             // Credits: substitute541 - http://blogs.love2d.org/content/circle-collisions
-            // FIXME: Sometimes particles will not detach for some time
+            // Improved and tweaked for this program
 
             {
                 const auto massDiff{_mass - near->_mass};
@@ -137,7 +135,7 @@ void Particle::tick(float deltaTime)
     if (GravityEnabled && _speed != NullVector)
         _speed.y += GRAVITY * deltaTime;
 
-//    _bounceNearby();
+    _bounceNearby();
 
     const auto pos = _shape.getPosition();
     const auto moveVec = sf::Vector2f{_speed.x * MAX_SPEED * deltaTime, _speed.y * MAX_SPEED * deltaTime};
@@ -204,9 +202,4 @@ Particle::EntityList *Particle::getNearbyEntities() const noexcept
 const sf::CircleShape &Particle::getShape() const noexcept
 {
     return _shape;
-}
-
-std::uint64_t Particle::getCollisionCount() noexcept
-{
-    return CollisionCount;
 }
